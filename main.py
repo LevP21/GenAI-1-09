@@ -1,16 +1,31 @@
 import os
+import sys
 
 import nltk
 from nltk import word_tokenize, ngrams
 from nltk.probability import FreqDist
 
-def find_ngrams(input_file):
+
+def find_ngrams(input_file: str) -> None:
+    """
+    Находит и выводит топ-5 биграмм и триграмм из текстового файла.
+
+    Args:
+        input_file (str): Путь к входному файлу с текстом
+
+    Returns:
+        None
+    """
     if not os.path.exists(input_file):
-        print(f"Входной файл {input_file} не найден")
+        print(f"Ошибка: Файл {input_file} не найден")
         return
 
-    with open(input_file, "r") as f:
-        text = f.read()
+    try:
+        with open(input_file, "r", encoding="utf-8") as f:
+            text = f.read()
+    except Exception as e:
+        print(f"Ошибка при чтении файла: {str(e)}")
+        return
 
     tokens = word_tokenize(text.lower())
 
@@ -29,8 +44,16 @@ def find_ngrams(input_file):
         print(f"{' '.join(trigram)}: {count}")
 
 
-nltk.download('punkt_tab')
-
-input_path = "input.txt"
-
-find_ngrams(input_path)
+if __name__ == "__main__":
+    try:
+        nltk.data.find('tokenizers/punkt_tab')
+    except LookupError:
+        nltk.download('punkt_tab')
+    
+    if len(sys.argv) > 1:
+        input_path = sys.argv[1]
+    else:
+        print("Ошибка: укажите входной файл")
+        exit()
+    
+    find_ngrams(input_path)
